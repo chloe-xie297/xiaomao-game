@@ -47,8 +47,6 @@ header .note{font-size:12.5px;color:var(--muted);font-family:var(--body);box-sha
 .area-name{font-size:22px;fill:#4d6b3c}
 .pin{cursor:pointer}
 .pin .halo{fill:var(--tigger);opacity:0;transition:opacity .2s}
-.pin.done .badge{fill:var(--tigger)}
-.pin.next .halo{opacity:.35;animation:pulse 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 .pin:focus-visible .badge{stroke:#3a78b5;stroke-width:5}
 .mark{cursor:pointer}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
@@ -111,12 +109,7 @@ header .note{font-size:12.5px;color:var(--muted);font-family:var(--body);box-sha
 #viewer img{display:block;max-width:min(88vw,720px);max-height:68vh;width:auto;height:auto}
 #viewer .cap{position:absolute;left:0;right:0;bottom:7px;text-align:center;font-family:var(--round);color:var(--muted)}
 
-/* tour finish */
-#done{position:fixed;inset:0;z-index:15;display:flex;align-items:center;justify-content:center;background:rgba(45,35,70,.3);
-  padding:16px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
-#done .card{background:var(--card);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);max-width:400px;width:100%;padding:20px 22px;display:flex;flex-direction:column;gap:10px;text-align:left}
-#done h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0}
-@media (prefers-reduced-motion:reduce){ .pin.next .halo{animation:none} #sheet .panel{animation:none} }
+@media (prefers-reduced-motion:reduce){ #sheet .panel{animation:none} }
 @media (max-width:420px){ header h1{font-size:17px} .btn{font-size:16px;padding:6px 12px} }
 </style>
 </head>
@@ -133,7 +126,6 @@ header .note{font-size:12.5px;color:var(--muted);font-family:var(--body);box-sha
 
 <div id="bar">
   <div class="grp">
-    <button class="btn" id="tourBtn">开始逛校园</button>
     <button class="btn ghost sm" id="markBtn">＋ 标记地点</button>
   </div>
   <div class="grp zoom">
@@ -149,29 +141,20 @@ header .note{font-size:12.5px;color:var(--muted);font-family:var(--body);box-sha
   <div class="row"><button class="btn ghost sm" id="vClose">关闭</button><button class="btn ghost sm" id="vDel">删除这张</button></div>
 </div>
 
-<div id="done" hidden>
-  <div class="card">
-    <div class="eyebrow">校园一日游 · 完成</div>
-    <h2>逛完啦！</h2>
-    <p style="margin:0">Busey Hall → ISR → Main Quad → 工程学院 → 绿街。小白菜带着小李一加走完了一圈，最后在绿街吃饱饱。</p>
-    <div class="row"><button class="btn" id="doneOk">好耶</button><button class="btn ghost" id="doneAgain">再逛一次</button></div>
-  </div>
-</div>
-
 <script>
 (()=>{
 const $=id=>document.getElementById(id);
 const NS='http://www.w3.org/2000/svg';
 const INK='#2d2346';
 
-/* ---------- places (route order) ---------- */
+/* ---------- places ---------- */
 const PLACES=[
   {id:'busey',name:'Busey Hall',en:'Busey-Evans Residence Halls',x:810,y:808,
-   say:'第一站 Busey Hall！我们从这里出发～',
+   say:'这里是 Busey Hall！红砖老楼是不是很好看？',
    info:'Busey-Evans 宿舍由 Busey Hall 和 Evans Hall 两栋红砖楼组成，是校园里历史比较久的宿舍楼，在 Main Quad 的东南边，靠近 Nevada St。',
    facts:['宿舍','红砖老楼','Nevada St 附近']},
   {id:'isr',name:'ISR',en:'Illinois Street Residence Halls',x:846,y:520,
-   say:'ISR 到啦！饿了可以直接去楼下食堂吃饭。',
+   say:'这是 ISR！饿了可以直接去楼下食堂吃饭。',
    info:'ISR 是 Illinois Street Residence Halls 的简称，由 Townsend Hall 和 Wardall Hall 两栋楼组成，楼里有 ISR 食堂。走几分钟就能到工程学院和 Main Quad。',
    facts:['宿舍','Townsend + Wardall','有食堂']},
   {id:'quad',name:'Main Quad',en:'Main Quadrangle',x:494,y:660,
@@ -179,26 +162,18 @@ const PLACES=[
    info:'校园的中心大草坪。北头是 Illini Union，南头是带圆顶的 Foellinger Auditorium。西北角 Wright St 和 Green St 路口有 Alma Mater 雕像，旁边是有钟楼的 Altgeld Hall。',
    facts:['Illini Union','Foellinger Auditorium','Alma Mater 雕像']},
   {id:'eng',name:'工程学院',en:'Engineering Campus',x:626,y:262,
-   say:'工程学院到啦，Grainger 图书馆是学习圣地！',
+   say:'这是工程学院，Grainger 图书馆是学习圣地！',
    info:'Green St 北边就是工程学院。中间的草坪叫 Bardeen Quad，北头是 Grainger 工程图书馆，计算机系的 Siebel Center 也在这一片。Boneyard Creek 小溪从这里穿过。',
    facts:['Bardeen Quad','Grainger Library','Siebel Center']},
   {id:'green',name:'绿街',en:'Green Street · Campustown',x:214,y:420,
-   say:'最后去绿街吃好吃的！奶茶、火锅都在这条街上。',
+   say:'来绿街吃好吃的！奶茶、火锅都在这条街上。',
    info:'Green Street 是 Campustown 的主街，从 Wright St 往西一路都是餐厅、奶茶店、咖啡店和小超市，晚上和周末最热闹。',
    facts:['Campustown','吃饭','奶茶']}
-];
-// walking legs between consecutive stops, following the streets
-const LEGS=[
-  [[810,808],[760,800],[760,540],[846,520]],
-  [[846,520],[846,520],[760,520],[600,520],[560,560],[494,660]],
-  [[494,660],[494,470],[530,420],[600,420],[600,320],[626,262]],
-  [[626,262],[600,320],[600,420],[380,420],[214,420]]
 ];
 
 /* ---------- storage ---------- */
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let marks=LS.get('uiuc-marks',[]);
-let visited=LS.get('uiuc-visited',[]);
 let dbp=null;
 function db(){ if(dbp)return dbp; dbp=new Promise((res,rej)=>{ try{ const r=indexedDB.open('uiuc-photos',1); r.onupgradeneeded=()=>{const s=r.result.createObjectStore('photos',{keyPath:'id'}); s.createIndex('place','place');}; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);}catch(e){rej(e)} }); return dbp; }
 const memPhotos=[];
@@ -272,11 +247,6 @@ function drawMap(){
   for(let i=0;i<70;i++){ const x=30+rnd(i)*940, y=30+rnd(i+50)*940; if(nearRoad(x,y)||inBuilding(x,y))continue; el('circle',{cx:x,cy:y,r:9+rnd(i+9)*6,fill:i%5===0?'#f0a24a':'#6fae5c',stroke:INK,'stroke-width':1.5,opacity:.95}); }
   // compass
   const cp=el('g',{transform:'translate(940,90)'}); el('circle',{cx:0,cy:0,r:26,fill:'#fff',stroke:INK,'stroke-width':2.5},cp); el('path',{d:'M0,-20 L8,6 L0,0 L-8,6Z',fill:'#e4473f',stroke:INK,'stroke-width':1.5},cp); txt(0,20,'N','street-name',cp,{'text-anchor':'middle',style:'font-size:14px;fill:#2d2346'});
-  // route
-  const routeD=LEGS.map(l=>'M'+l.map(p=>p.join(',')).join(' L')).join(' ');
-  el('path',{d:routeD,fill:'none',stroke:'#fff','stroke-width':11,'stroke-linecap':'round','stroke-linejoin':'round',opacity:.85});
-  el('path',{d:routeD,fill:'none',stroke:'#d9708f','stroke-width':4,'stroke-dasharray':'2 12','stroke-linecap':'round','stroke-linejoin':'round'});
-  legPaths=LEGS.map(l=>el('path',{d:'M'+l.map(p=>p.join(',')).join(' L'),fill:'none',stroke:'none'}));
   // pins
   pinsG=el('g',{});
   marksG=el('g',{});
@@ -287,19 +257,19 @@ function drawMap(){
 function nearRoad(x,y){ for(const v of [180,420,520,940])if(Math.abs(y-v)<28)return true; for(const v of [380,600,760,940])if(Math.abs(x-v)<28)return true; if(x>600&&Math.abs(y-740)<28)return true; return false; }
 function inBuilding(x,y){ const boxes=[[20,370,360,100],[390,420,210,480],[400,30,500,120],[400,190,440,140],[770,450,150,150],[760,760,170,120],[280,430,110,60],[900,50,80,80]]; return boxes.some(([bx,by,w,h])=>x>bx-12&&x<bx+w+12&&y>by-12&&y<by+h+12); }
 
-let pinsG,marksG,charsG,bunny,cat,legPaths=[];
+let pinsG,marksG,charsG,bunny,cat;
 function renderPins(){
   pinsG.innerHTML='';
   PLACES.forEach((p,i)=>{
-    const g=el('g',{class:'pin'+(visited.includes(p.id)?' done':'')+(i===tourIdx+1&&tourOn?' next':''),transform:`translate(${p.x},${p.y})`,tabindex:0,role:'button','aria-label':`第${i+1}站 ${p.name}`},pinsG);
+    const g=el('g',{class:'pin',transform:`translate(${p.x},${p.y})`,tabindex:0,role:'button','aria-label':p.name},pinsG);
     el('circle',{class:'halo',r:34},g);
     el('path',{d:'M0,0 C-14,-20 -24,-30 -24,-46 A24,24 0 1 1 24,-46 C24,-30 14,-20 0,0Z',class:'badge',fill:'#fffdf8',stroke:INK,'stroke-width':3},g);
-    txt(0,-38,String(i+1),'',g,{'text-anchor':'middle',style:'font-size:24px;fill:#2d2346'});
+    el('circle',{cx:0,cy:-46,r:9,fill:'#f4a6bd',stroke:INK,'stroke-width':2.5},g);
     const lab=el('g',{transform:'translate(0,22)'},g);
     const w=p.name.length*(/[a-z]/i.test(p.name)?12:22)+26;
     el('rect',{x:-w/2,y:-4,width:w,height:30,rx:15,fill:'#2d2346'},lab);
     txt(0,18,p.name,'',lab,{'text-anchor':'middle',style:'font-size:18px;fill:#fffdf8'});
-    const open=()=>openPlace(p.id); g.addEventListener('click',e=>{e.stopPropagation(); if(!placing)open();}); g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
+    const open=()=>{ openPlace(p.id); scrollToPt(p.x,p.y,.22); }; g.addEventListener('click',e=>{e.stopPropagation(); if(!placing)open();}); g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
   });
 }
 function renderMarks(){
@@ -341,44 +311,8 @@ function charG(kind){
 }
 function setChar(c,x,y,face,bob){ c.x=x;c.y=y;c.face=face; c.g.setAttribute('transform',`translate(${x},${y-bob}) scale(${1.25*face},1.25)`); }
 
-/* ---------- tour ---------- */
-let tourOn=false, tourIdx=-1, walking=false;
-function placeChars(){
-  const p=PLACES[Math.max(0,tourIdx)];
-  setChar(bunny,p.x+22,p.y-6,-1,0); setChar(cat,p.x-24,p.y-4,1,0);
-  bunny.g.style.display=cat.g.style.display=tourOn?'':'none';
-}
-function updateTourBtn(){
-  const b=$('tourBtn');
-  if(!tourOn){ b.textContent='开始逛校园'; return; }
-  if(tourIdx>=PLACES.length-1){ b.textContent='逛完啦 ✓'; return; }
-  b.textContent='下一站：'+PLACES[tourIdx+1].name;
-}
-function startTour(){ tourOn=true; tourIdx=0; placeChars(); renderPins(); updateTourBtn(); arrive(0); }
-function arrive(i){ if(!visited.includes(PLACES[i].id)){visited.push(PLACES[i].id); LS.set("uiuc-visited",visited);} renderPins(); openPlace(PLACES[i].id,true); scrollToPt(PLACES[i].x,PLACES[i].y,.2); }
-function walk(){
-  if(walking)return; const leg=legPaths[tourIdx]; if(!leg)return;
-  closeSheet(); walking=true; const len=leg.getTotalLength(), speed=150, gap=40; let t0=null;
-  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  const stepF=ts=>{
-    if(t0===null)t0=ts; const d=reduce?len:Math.min(len,(ts-t0)/1000*speed);
-    const pb=leg.getPointAtLength(d), pa=leg.getPointAtLength(Math.max(0,d-2));
-    const pc=leg.getPointAtLength(Math.max(0,d-gap)), pd=leg.getPointAtLength(Math.max(0,d-gap-2));
-    const bob=Math.abs(Math.sin(ts/90))*5;
-    setChar(bunny,pb.x,pb.y,pb.x>=pa.x?1:-1,bob); setChar(cat,pc.x,pc.y,pc.x>=pd.x?1:-1,Math.abs(Math.sin(ts/90+1))*4);
-    followPt(pb.x,pb.y);
-    if(d<len)requestAnimationFrame(stepF);
-    else { walking=false; tourIdx++; placeChars(); updateTourBtn(); arrive(tourIdx); }
-  };
-  requestAnimationFrame(stepF);
-}
-$('tourBtn').onclick=()=>{
-  if(!tourOn)return startTour();
-  if(tourIdx>=PLACES.length-1){ $('done').hidden=false; return; }
-  walk();
-};
-$('doneOk').onclick=()=>{$('done').hidden=true;};
-$('doneAgain').onclick=()=>{$('done').hidden=true; startTour();};
+/* the two friends just stand together on the lawn by Altgeld */
+function placeChars(){ setChar(bunny,262,600,-1,0); setChar(cat,214,604,1,0); }
 
 /* ---------- zoom & scrolling ---------- */
 let zoom=1; const wrap=$('mapWrap');
@@ -391,8 +325,6 @@ $('zin').onclick=()=>applyZoom(zoom*1.35); $('zout').onclick=()=>applyZoom(zoom/
 function svgToScreen(x,y){ const pt=svg.createSVGPoint(); pt.x=x; pt.y=y; const m=svg.getScreenCTM(); return pt.matrixTransform(m); }
 function scrollToPt(x,y,fy=.4){ const s=svgToScreen(x,y), r=wrap.getBoundingClientRect(); glide(wrap.scrollLeft+s.x-r.width/2,wrap.scrollTop+s.y-r.height*fy); }
 function glide(tx,ty){ tx=Math.max(0,Math.min(tx,wrap.scrollWidth-wrap.clientWidth)); ty=Math.max(0,Math.min(ty,wrap.scrollHeight-wrap.clientHeight)); const x0=wrap.scrollLeft,y0=wrap.scrollTop; let t0=null; const f=ts=>{ if(t0===null)t0=ts; const k=Math.min(1,(ts-t0)/450), e=1-Math.pow(1-k,3); wrap.scrollLeft=x0+(tx-x0)*e; wrap.scrollTop=y0+(ty-y0)*e; if(k<1)requestAnimationFrame(f); }; requestAnimationFrame(f); }
-function followPt(x,y){ const s=svgToScreen(x,y), r=wrap.getBoundingClientRect(); const mx=r.width*.25, my=r.height*.25;
-  if(s.x<mx||s.x>r.width-mx||s.y<my+40||s.y>r.height-my-60){ wrap.scrollLeft+= (s.x-r.width/2)*.08; wrap.scrollTop+=(s.y-r.height*.45)*.08; } }
 
 /* ---------- custom markers ---------- */
 let placing=false;
@@ -425,21 +357,17 @@ function wirePhotos(placeId,label,rerender){
   };
   panel.querySelectorAll('.ph').forEach(b=>b.onclick=()=>openViewer(b.dataset.id,b.querySelector('img').src,label,rerender));
 }
-async function openPlace(id,fromTour){
+async function openPlace(id){
   const i=PLACES.findIndex(p=>p.id===id), p=PLACES[i]; current=id;
   const render=async()=>{
     const ps=await photoSection(p.id,p.name);
     panel.innerHTML=`<div class="grab"></div>
-      <div class="sheet-head"><div class="t"><div class="eyebrow">第 ${i+1} 站${visited.includes(p.id)?' · 去过啦':''}</div><h2>${p.name}</h2><div class="en">${p.en}</div></div><button class="close" id="sClose" aria-label="关闭">✕</button></div>
+      <div class="sheet-head"><div class="t"><div class="eyebrow">UIUC · 地点</div><h2>${p.name}</h2><div class="en">${p.en}</div></div><button class="close" id="sClose" aria-label="关闭">✕</button></div>
       <div class="say"><svg viewBox="-26 -60 52 66" aria-hidden="true">${bunny.inner.innerHTML}</svg><div class="bub">${p.say}</div></div>
       <p class="info">${p.info}</p>
       <ul class="facts">${p.facts.map(f=>`<li>${f}</li>`).join('')}</ul>
-      ${ps}
-      ${fromTour&&i<PLACES.length-1?`<div class="row"><button class="btn pink" id="sNext">跟小白菜去下一站：${PLACES[i+1].name}</button></div>`:''}
-      ${fromTour&&i===PLACES.length-1?`<div class="row"><button class="btn pink" id="sDone">逛完啦！</button></div>`:''}`;
+      ${ps}`;
     $('sClose').onclick=closeSheet;
-    if($('sNext'))$('sNext').onclick=walk;
-    if($('sDone'))$('sDone').onclick=()=>{closeSheet(); $('done').hidden=false;};
     wirePhotos(p.id,p.name,render);
   };
   $('sheet').hidden=false; await render(); panel.scrollTop=0;
@@ -475,7 +403,7 @@ $('vDel').onclick=async()=>{ if(!vArm){vArm=true; $('vDel').textContent='再点�
   vArm=false; await delPhoto(vState.id); $('viewer').hidden=true; vState.rerender(); };
 addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!$('viewer').hidden)$('viewer').hidden=true; else closeSheet(); } });
 
-drawMap(); updateTourBtn();
+drawMap();
 // start centred on the Main Quad
 requestAnimationFrame(()=>{ const s=svgToScreen(560,560), r=wrap.getBoundingClientRect(); wrap.scrollLeft+=s.x-r.width/2; wrap.scrollTop+=s.y-r.height/2; });
 })();
