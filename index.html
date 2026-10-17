@@ -182,7 +182,7 @@ body.portrait .only-portrait{display:block}
   <div class="card">
     <div class="eyebrow">延吉 → UIUC · 一万多公里</div>
     <h1><span class="c">小猫</span>找<span class="b">兔兔</span></h1>
-    <p>小李一加住在延吉，兔兔在美国的 UIUC。帮小李一加一路闯过北京、上海、太平洋、旧金山和芝加哥，去找闺蜜兔兔吧！</p>
+    <p>小李一加住在延吉，兔兔在美国的 UIUC。帮小李一加一路闯过北京、上海、旧金山和芝加哥，去找闺蜜兔兔吧！</p>
     <div class="row"><button class="btn" id="startBtn">开始冒险</button></div>
     <p class="note only-portrait">把手机横过来玩，视野更大哦。</p>
   </div>
@@ -267,7 +267,7 @@ body.portrait .only-portrait{display:block}
     <div class="endtext">
       <div class="eyebrow">UIUC · 终点</div>
       <h2>终于见到兔兔啦！</h2>
-      <p>从延吉出发，经过北京、上海、太平洋、旧金山和芝加哥，一万多公里。闺蜜，终于见面啦！在 Alma Mater 前拍一张合照留念。</p>
+      <p>从延吉出发，经过北京和上海，飞过太平洋，再经过旧金山和芝加哥，一万多公里。闺蜜，终于见面啦！在 Alma Mater 前拍一张合照留念。</p>
       <div class="stat"><span>一共收集小鱼干 <b id="endFish">0/0</b></span></div>
       <div class="row"><button class="btn" id="endMapBtn">回到地图</button></div>
     </div>
@@ -280,7 +280,7 @@ const $=id=>document.getElementById(id);
 const cv=$('cv'); let ctx=cv.getContext('2d');
 const INK='#2d2346', WHITE='#fefefe', SHADE='#e6e4ee', PATCH='#c9c6d4', PINK='#f4a6bd', CREAM='#fffdf8';
 const FONT='"ZCOOL KuaiLe","PingFang SC","Microsoft YaHei",sans-serif';
-const VH=360, G=1800, RUN=190, JUMP=620, SPRING=900;
+const VH=360, G=1700, RUN=185, JUMP=660, SPRING=900, MAXH=5;
 
 let W=0,H=0,DPR=1,S=1,viewW=0,viewH=0,camX=0,camY=0;
 function resize(){
@@ -324,9 +324,9 @@ syncSoundBtn();
 addEventListener('pointerdown',()=>{ if(soundOn)ac(); },{passive:true});
 
 /* ---------- save ---------- */
-let save={unlocked:0,fish:[0,0,0,0,0,0,0],letters:[],done:false};
-try{const s=JSON.parse(localStorage.getItem('catbunny-v2')||'null'); if(s&&Array.isArray(s.fish))save=Object.assign(save,s);}catch(e){}
-function persist(){ try{localStorage.setItem('catbunny-v2',JSON.stringify(save))}catch(e){} }
+let save={unlocked:0,fish:[0,0,0,0,0,0],letters:[],done:false};
+try{const s=JSON.parse(localStorage.getItem('catbunny-v3')||'null'); if(s&&Array.isArray(s.fish))save=Object.assign(save,s);}catch(e){}
+function persist(){ try{localStorage.setItem('catbunny-v3',JSON.stringify(save))}catch(e){} }
 
 /* ---------- letters ---------- */
 const LETTERS={
@@ -385,7 +385,7 @@ function builder(){
     fr(x,y,n,gap=30){for(let i=0;i<n;i++)b.f(x+i*gap,y);},
     fa(x,y,n,gap=30,h=40){for(let i=0;i<n;i++){const t=n>1?i/(n-1):.5;b.f(x+i*gap,y-Math.sin(t*Math.PI)*h);}},
     s(x,w,y=300){L.spikes.push({x,y:y-14,w,h:14});},
-    e(x,y,range,type){const fly=type==='gull';L.enemies.push({x,y:fly?y-11:y-22,by:y-11,w:30,h:22,x0:x,x1:x+range,vx:fly?55:42,type,fly,dead:0});},
+    e(x,y,range,type){const fly=type==='gull';L.enemies.push({x,y:fly?y-11:y-22,by:y-11,w:30,h:22,x0:x,x1:x+range,vx:fly?40:28,type,fly,dead:0});},
     sp(x,y,type){L.springs.push({x,y:y-14,w:type==='dolphin'?46:34,h:14,type,sq:0});},
     cp(x,y=300){L.cps.push({x,y,on:false});},
     d(type,x,y,text){L.decor.push({type,x,y,text});},
@@ -420,9 +420,9 @@ const LEVELS=[
     b.g(2080,520); b.e(2140,300,170,'mouse'); b.fr(2330,272,3); b.d('tower',2440,300);
     b.goal(2520,300);
   }},
- {name:'上海 · 外滩',node:'上海',theme:'shanghai',width:3000,sign:'去码头 →',
+ {name:'上海 · 外滩',node:'上海',theme:'shanghai',width:3000,sign:'去机场 →',
   intro:'到上海啦！晚上的外滩亮晶晶的。咦，路边好像有一封兔兔寄来的信……',
-  clear:'外滩通关！',clearText:'收好兔兔的信，小李一加要坐船出海啦。',
+  clear:'外滩通关！',clearText:'收好兔兔的信，小李一加坐上飞机，飞过太平洋去美国啦！',
   build(b){
     b.g(0,420); b.letter('sh',210); b.fr(280,272,3); b.d('lamp',60,300); b.d('lamp',360,300);
     b.p(470,250,90); b.fr(485,222,3,28);
@@ -435,23 +435,6 @@ const LEVELS=[
     b.g(2280,720); b.e(2380,300,200,'mouse'); b.e(2680,300,150,'mouse'); b.fr(2410,250,4); b.d('lamp',2600,300);
     b.goal(2920,300);
   }},
- {name:'太平洋',node:'太平洋',theme:'ocean',width:3400,killY:352,sign:'美国到啦 →',
-  intro:'大海好宽呀！踩着小船和云朵，请海豚帮忙弹过去。小心别掉进水里。',
-  clear:'横渡太平洋！',clearText:'远远看到了金门大桥，小李一加到美国啦！',
-  build(b){
-    b.g(0,320,300,'dock'); b.fr(120,272,4);
-    b.m(370,300,110,130,0,4,'boat');
-    b.sp(650,330,'dolphin'); b.fa(640,200,3,40,30);
-    b.g(790,260,290,'island'); b.cp(830,290); b.fr(890,262,4); b.e(820,180,180,'gull'); b.d('palm',1000,290);
-    b.p(1110,250,70,'cloud'); b.p(1240,215,70,'cloud'); b.fr(1250,187,2,28);
-    b.m(1360,300,100,190,0,3.6,'boat');
-    b.g(1720,300,290,'island'); b.e(1760,195,200,'gull'); b.fa(1760,262,5,30,40); b.d('palm',1960,290);
-    b.sp(2060,330,'dolphin'); b.sp(2220,330,'dolphin'); b.fa(2060,190,6,32,50);
-    b.g(2370,400,290,'island'); b.cp(2400,290); b.e(2450,185,220,'gull'); b.fr(2520,262,4); b.d('palm',2700,290);
-    b.m(2810,300,110,150,0,3.6,'boat');
-    b.g(3090,310,300,'dock'); b.fr(3120,272,3);
-    b.goal(3320,300);
-  }},
  {name:'旧金山 · 金门大桥',node:'旧金山',theme:'sf',width:3400,sign:'去芝加哥 →',
   intro:'到美国啦！雾蒙蒙的金门大桥上，好像又有一封兔兔的信。',
   clear:'金门大桥通关！',clearText:'小李一加跳上横穿美国的火车，往东去芝加哥。',
@@ -462,7 +445,7 @@ const LEVELS=[
     b.g(1600,260,280,'hill'); b.cp(1640,280); b.fr(1700,252,3);
     b.g(1860,240,250,'hill'); b.e(1900,250,160,'crab');
     b.g(2100,180,220,'hill'); b.fr(2120,192,3);
-    b.m(2330,200,100,260,0,4.2,'cablecar'); b.fa(2400,150,4,40,30);
+    b.m(2330,200,100,260,0,4.2,'cablecar'); b.fa(2400,150,4,40,30); b.p(2370,280,80,'beam'); b.p(2540,280,110,'beam');
     b.g(2740,660,250,'hill'); b.e(2820,250,140,'crab'); b.sp(3000,250); b.p(3020,90,130,'beam'); b.fr(3035,62,4,28); b.e(3150,250,110,'crab');
     b.goal(3330,250);
   }},
@@ -474,7 +457,7 @@ const LEVELS=[
     b.p(620,250,90,'ltrack'); b.p(760,210,90,'ltrack'); b.fr(775,182,3,28);
     b.g(900,500,300,'plaza'); b.e(950,300,200,'pigeon'); b.s(1200,40); b.fa(1175,262,3,30,50); b.sp(1330,300); b.p(1340,110,140,'beam'); b.fr(1355,82,4,28);
     b.g(1500,320,300,'plaza'); b.cp(1540); b.fr(1620,272,4);
-    b.m(1870,250,130,280,0,4.2,'train'); b.fa(1900,200,5,40,30);
+    b.m(1870,220,130,280,0,4.2,'train'); b.fa(1900,170,5,40,30); b.p(1900,300,80,'ltrack'); b.p(2070,300,80,'ltrack'); b.p(2230,300,100,'ltrack');
     b.g(2330,870,300,'plaza'); b.e(2420,300,160,'pigeon'); b.p(2620,220,90,'ltrack'); b.fr(2635,192,3,28); b.e(2780,300,160,'pigeon'); b.fr(2960,272,3);
     b.goal(3120,300);
   }},
@@ -485,7 +468,7 @@ const LEVELS=[
     b.p(600,240,90,'brick'); b.p(740,190,90,'brick'); b.fr(755,162,3,28);
     b.g(880,520,300,'quad'); b.d('tree',940,300); b.s(1050,40); b.fa(1025,262,3,30,50); b.e(1130,300,180,'squirrel'); b.sp(1340,300); b.p(1350,100,130,'brick'); b.fr(1365,72,4,28);
     b.g(1500,300,300,'quad'); b.cp(1540); b.d('illini',1680,300); b.fr(1600,272,3);
-    b.m(1850,250,90,200,0,3.6,'brick'); b.fa(1880,200,4,40,30);
+    b.m(1850,250,90,200,0,3.6,'brick'); b.fa(1880,200,4,40,30); b.p(1890,300,70,'brick'); b.p(2070,300,70,'brick');
     b.g(2190,420,280,'quad'); b.d('tree',2560,280); b.e(2240,280,250,'squirrel'); b.fr(2260,252,4);
     b.p(2660,240,80,'brick'); b.p(2790,210,80,'brick');
     b.g(2920,480,250,'quad'); b.d('tree',2980,250); b.fr(3000,222,3); b.d('alma',3330,250);
@@ -505,12 +488,12 @@ function loadLevel(i){
   LI=i; const d=LEVELS[i], b=builder(); d.build(b);
   lvl=Object.assign({},d,b.L); lvl.killY=d.killY||470; lt=0; particles=[]; fishGot=0;
   const sy=surfaceAt(40);
-  P={x:30,y:sy-24,w:28,h:24,vx:0,vy:0,face:1,ground:null,coyote:0,buffer:0,inv:0,hearts:3,anim:0,spawnX:30,spawnY:sy-24};
+  P={x:30,y:sy-24,w:28,h:24,vx:0,vy:0,face:1,ground:null,coyote:0,buffer:0,inv:0,hearts:MAXH,anim:0,spawnX:30,spawnY:sy-24};
   camX=0; updateHud();
 }
 function updateHud(){
   $('hudLevel').textContent=lvl.name;
-  let h=''; for(let i=0;i<3;i++)h+= i<P.hearts?'♥':'<span class="off">♥</span>';
+  let h=''; for(let i=0;i<MAXH;i++)h+= i<P.hearts?'♥':'<span class="off">♥</span>';
   $('hudHearts').innerHTML=h; $('fishN').textContent=fishGot+'/'+lvl.fishTotal;
 }
 let toastTimer=0;
@@ -524,11 +507,11 @@ function setState(s){ state=s; const play=s==='play'; $('hud').hidden=!play; $('
 function burst(x,y,n,color,type,spd=120){ for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2, v=spd*(.4+Math.random()*.8); particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-40,life:.6+Math.random()*.3,max:.9,color,type});} }
 
 function hurt(){
-  if(P.inv>0)return; P.hearts--; SFX.hurt(); P.inv=1.4; P.vy=-380; P.vx=-P.face*160; P.ground=null;
-  if(P.hearts<=0){ P.hearts=3; respawn(); toast('再来一次，加油！'); }
+  if(P.inv>0)return; P.hearts--; SFX.hurt(); P.inv=2; P.vy=-380; P.vx=-P.face*160; P.ground=null;
+  if(P.hearts<=0){ P.hearts=MAXH; respawn(); toast('再来一次，加油！'); }
   updateHud();
 }
-function fell(){ P.hearts--; SFX.hurt(); if(P.hearts<=0){P.hearts=3; toast('再来一次，加油！');} else toast('扑通！'); respawn(); updateHud(); }
+function fell(){ P.hearts--; SFX.hurt(); if(P.hearts<=0){P.hearts=MAXH; toast('再来一次，加油！');} else toast('扑通！'); respawn(); updateHud(); }
 function respawn(){ P.x=P.spawnX; P.y=P.spawnY; P.vx=0; P.vy=0; P.inv=1.2; P.ground=null; camX=clamp(P.x-viewW*.38,0,Math.max(0,lvl.width-viewW)); }
 
 function step(dt){
@@ -539,7 +522,7 @@ function step(dt){
   else { const fr=(P.ground?1900:450)*dt; P.vx=Math.abs(P.vx)<=fr?0:P.vx-Math.sign(P.vx)*fr; }
   if(P.ground&&P.ground.mover){ P.x+=P.ground.mdx; P.y+=P.ground.mdy; }
   if(jumpPressed){P.buffer=.14; jumpPressed=false;}
-  P.buffer-=dt; P.coyote=P.ground?.1:P.coyote-dt;
+  P.buffer-=dt; P.coyote=P.ground?.16:P.coyote-dt;
   if(P.buffer>0&&P.coyote>0){ P.vy=-JUMP; P.buffer=0; P.coyote=0; P.ground=null; SFX.jump(); burst(P.x+P.w/2,P.y+P.h,5,'#ffffff','dust',60); }
   if(!keys.jump&&P.vy<-330)P.vy=-330;
   P.vy=Math.min(P.vy+G*dt,820);
@@ -555,13 +538,13 @@ function step(dt){
   }
   P.anim+=dt; P.inv=Math.max(0,P.inv-dt);
   for(const s of lvl.springs){ s.sq=Math.max(0,s.sq-dt*3); if(P.vy>0&&ov(P,s)&&prevB<=s.y+14){ P.vy=-SPRING; P.ground=null; s.sq=1; SFX.spring(); burst(s.x+s.w/2,s.y,6,s.type==='dolphin'?'#bfe8ff':'#ffe08a','dot',90);} }
-  for(const s of lvl.spikes){ if(ov(P,{x:s.x+4,y:s.y+5,w:s.w-8,h:s.h-5}))hurt(); }
+  for(const s of lvl.spikes){ if(ov(P,{x:s.x+7,y:s.y+8,w:s.w-14,h:s.h-8}))hurt(); }
   for(const e of lvl.enemies){
     if(e.dead)continue;
     e.x+=e.vx*dt; if(e.x<e.x0){e.x=e.x0;e.vx=Math.abs(e.vx);} if(e.x>e.x1){e.x=e.x1;e.vx=-Math.abs(e.vx);}
     if(e.fly)e.y=e.by+Math.sin(lt*3+e.x0)*10;
-    if(ov(P,{x:e.x+3,y:e.y+2,w:e.w-6,h:e.h-2})){
-      if(P.vy>0&&prevB<=e.y+14){ e.dead=1; P.vy=keys.jump?-JUMP:-430; SFX.stomp(); burst(e.x+e.w/2,e.y+e.h/2,9,'#ffd84a','star',150); }
+    if(ov(P,{x:e.x+6,y:e.y+5,w:e.w-12,h:e.h-5})){
+      if(P.vy>0&&prevB<=e.y+18){ e.dead=1; P.vy=keys.jump?-JUMP:-430; SFX.stomp(); burst(e.x+e.w/2,e.y+e.h/2,9,'#ffd84a','star',150); }
       else hurt();
     }
   }
@@ -1065,7 +1048,7 @@ cv.addEventListener('touchstart',e=>{ if(state==='play')e.preventDefault(); },{p
 
 /* ---------- screens ---------- */
 const NODES=[
-  {x:212,y:84,n:'延吉',ly:-22},{x:150,y:118,n:'北京',ly:30},{x:192,y:182,n:'上海',ly:30},{x:300,y:150,n:'太平洋',ly:30},
+  {x:212,y:84,n:'延吉',ly:-22},{x:150,y:118,n:'北京',ly:30},{x:192,y:182,n:'上海',ly:30},
   {x:412,y:178,n:'旧金山',ly:30},{x:512,y:118,n:'芝加哥',ly:-22},{x:540,y:170,n:'UIUC',ly:30}];
 let mapSel=0;
 function renderMap(){
@@ -1089,7 +1072,7 @@ function renderMap(){
   });
   const c=NODES[nextIdx], up=c.ly<0?1:-1;
   s+=`<g transform="translate(${c.x+(up>0?0:0)},${c.y+(up>0?36:-32)})"><path d="M-9,-3 L-8,-15 L-2,-9 Z M9,-3 L8,-15 L2,-9 Z" fill="#fff" stroke="#2d2346" stroke-width="1.6" stroke-linejoin="round"/><ellipse rx="10" ry="9" fill="#fff" stroke="#2d2346" stroke-width="2"/><circle cx="-2" cy="-1" r="1.3" fill="#2d2346"/><circle cx="4" cy="-1" r="1.3" fill="#2d2346"/></g>`;
-  const b=NODES[6];
+  const b=NODES[NODES.length-1];
   s+=`<g transform="translate(${b.x+32},${b.y+4})"><ellipse cx="-4" cy="-16" rx="3.4" ry="9" fill="#fff" stroke="#2d2346" stroke-width="1.5"/><ellipse cx="4" cy="-16" rx="3.4" ry="9" fill="#fff" stroke="#2d2346" stroke-width="1.5"/><ellipse rx="10" ry="9.5" fill="#fff" stroke="#2d2346" stroke-width="2"/><circle cx="-1" cy="-1" r="1.3" fill="#2d2346"/><circle cx="5" cy="-1" r="1.3" fill="#2d2346"/><path d="M-4,7 L7,5 L3,12Z" fill="#f4a6bd" stroke="#2d2346" stroke-width="1.2"/></g>`;
   s+='</svg>';
   $('mapSvg').innerHTML=s;
